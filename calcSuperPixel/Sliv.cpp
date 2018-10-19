@@ -11,7 +11,7 @@ Sliv::Sliv(wstring fileName, int k, int m)
 	N = width * height, K = k, M = m;
 	S = (int)sqrtf(N / K);
 
-	label = vector<Cluster*>(width * height, NULL);
+	label = vector<Cluster*>(N, NULL);
 	dis = vector<vector<float>>(width, vector<float>(height, 1e10));
 }
 
@@ -62,21 +62,21 @@ void Sliv::adjustCluster()
 
 void Sliv::search()
 {
-	int x, y;
-	float L, A, B, Dc, Ds, D;
+	int x, y, xMin, xMax, yMin, yMax;
+	float L, A, B, l, a, b, Dc, Ds, D;
 	for (Cluster& cluster : clusters) {
-		int xMin  = cluster.x - 2 * S, xMax = cluster.x + 2 * S;
-		int yMin = cluster.y - 2 * S, yMax = cluster.y + 2 * S;
+		xMin  = max(cluster.x - 2 * S, 0), xMax = min(cluster.x + 2 * S, width - 1);
+		yMin = max(cluster.y - 2 * S, 0), yMax = min(cluster.y + 2 * S, height - 1);
+		l = cluster.p[0], a = cluster.p[1], b = cluster.p[2];
 		for (x = xMin; x <= xMax; x++) {
-			if (x < 0 || x >= width) continue;
 			for (y = yMin; y <= yMax; y++) {
-				if (y < 0 || y >= height) continue;
 				L = image[x][y][0], A = image[x][y][1], B = image[x][y][2];
-				Dc = sqrt(pow(L - cluster.p[0], 2) + pow(A - cluster.p[1], 2) + pow(B - cluster.p[2], 2));
+				Dc = sqrt(pow(L - l, 2) + pow(A - a, 2) + pow(B - b, 2));
 				Ds = sqrt(pow(x - cluster.x, 2) + pow(y - cluster.y, 2));
 				D = sqrt(pow(Dc / M, 2) + pow(Ds / S, 2));
+
 				if (D < dis[x][y]) {
-					int position = x * width + y;
+					int position = x * height + y;
 					if (label[position]) {
 						label[position]->points.erase(position);
 					}
@@ -93,16 +93,20 @@ void Sliv::update()
 {
 	int x, y;
 	for (Cluster& cluster : clusters) {
-		int sumX = 0, sumY = 0;
+		int sumX = 0, sumY = 0, num = cluster.points.size();
+		float sumL = 0, sumA = 0, sumB = 0;
 		for (int position : cluster.points) {
 			x = position / width;
 			y = position % height;
 			sumX += x;
 			sumY += y;
+			sumL += image[x][y][0];
+			sumA += image[x][y][1];
+			sumB += image[x][y][2];
 		}
-		x = sumX / cluster.points.size();
-		y = sumY / cluster.points.size();
-		cluster.update(x, y, image[x][y]);
+		x = sumX / num;
+		y = sumY / num;
+		cluster.update(x, y, sumL / num, sumA / num, sumB / num);
 	}
 }
 
@@ -113,10 +117,13 @@ void Sliv::train(int times)
 	for (int i = 0; i < times; i++) {
 		time_t start = time(0);
 		search();
-		update();
 		time_t end = time(0);
-		std::cout << i << " " << end - start << endl;
+		std::cout << i << " search " << end - start << endl;
+		update();
+		end = time(0);
+		std::cout << i << " update " << time(0) - end << endl;
 		wstring name = L"lena" + to_wstring(i) + L".jpg";
+		end = time(0);
 		save(name);
 		std::cout << "save time " << time(0) - end << endl;
 	}
@@ -124,12 +131,12 @@ void Sliv::train(int times)
 
 void Sliv::save(wstring fileName)
 {
-	int x, y, w = width, h = height;
+	int x, y;
 	IMAGE newImage = Image::copy(image, width, height);
 	for (Cluster& cluster : clusters)
 		for (int  p : cluster.points) {
-			x = p / w;
-			y = p % w;
+			x = p / height;
+			y = p % height;
 			newImage[x][y][0] = cluster.p[0];
 			newImage[x][y][1] = cluster.p[1];
 			newImage[x][y][2] = cluster.p[2];

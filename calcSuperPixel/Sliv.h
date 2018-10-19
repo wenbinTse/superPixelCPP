@@ -16,6 +16,9 @@ public:
 	void update(int _x, int _y, Pixel _p) {
 		x = _x, y = _y, p[0] = _p[0], p[1] = _p[1], p[2] = _p[2];
 	}
+	void update(int _x, int _y, float l, float a, float b) {
+		x = _x, y = _y, p[0] = l, p[1] = a, p[2] = b;
+	}
 };
 
 class Sliv
