@@ -115,17 +115,11 @@ void Sliv::train(int times)
 	initClusters();
 	adjustCluster();
 	for (int i = 0; i < times; i++) {
-		time_t start = time(0);
+		cout << "µÚ" << (i + 1) << "´Îµü´ú" << endl;
 		search();
-		time_t end = time(0);
-		std::cout << i << " search " << end - start << endl;
 		update();
-		end = time(0);
-		std::cout << i << " update " << time(0) - end << endl;
 		wstring name = L"lena" + to_wstring(i) + L".jpg";
-		end = time(0);
 		save(name);
-		std::cout << "save time " << time(0) - end << endl;
 	}
 }
 
