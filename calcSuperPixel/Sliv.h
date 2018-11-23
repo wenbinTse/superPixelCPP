@@ -8,9 +8,7 @@ class Cluster {
 public:
 	int x, y;
 	Pixel p = {0, 0, 0};
-	set<int> points;
 	Cluster(int _x, int _y, Pixel _p) {
-		
 		update(_x, _y, _p);
 	}
 	void update(int _x, int _y, Pixel _p) {
@@ -27,8 +25,15 @@ public:
 	IMAGE image;
 	int K, M, N, S, width, height;
 	vector<Cluster> clusters;
-	vector<Cluster*> label;
+	vector<int> label; // 存储对应的Cluster的ID
 	vector<vector<float>> dis;
+
+	vector<int> num; // 聚类数目
+	vector<float> sumL;
+	vector<float> sumA;
+	vector<float> sumB;
+	vector<int> sumX;
+	vector<int> sumY;
 
 	Sliv(wstring fileName, int k, int m);
 	void initClusters();
