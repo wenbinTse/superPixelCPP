@@ -21,7 +21,7 @@
     <ClInclude Include="Image.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Sliv.h">
+    <ClInclude Include="Slic.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,7 +35,7 @@
     <ClCompile Include="Image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Sliv.cpp">
+    <ClCompile Include="Slic.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

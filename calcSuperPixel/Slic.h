@@ -19,7 +19,7 @@ public:
 	}
 };
 
-class Sliv
+class Slic
 {
 public:
 	IMAGE image;
@@ -35,9 +35,9 @@ public:
 	vector<int> sumX;
 	vector<int> sumY;
 
-	Sliv(wstring fileName, int k, int m);
+	Slic(wstring fileName, int k, int m);
 	void initClusters();
-	float getGradient(int x, int y);
+	float getGradient(int& x, int& y);
 	void adjustCluster();
 	void search();
 	void update();

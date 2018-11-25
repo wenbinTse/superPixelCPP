@@ -1,21 +1,21 @@
 #include "pch.h"
 
-#include "Sliv.h"
+#include "Slic.h"
 #include "ctime"
 #include "iostream"
 
-Sliv::Sliv(wstring fileName, int k, int m)
+Slic::Slic(wstring fileName, int k, int m)
 {
 	image = Image::read(fileName, width, height);
 
 	N = width * height, K = k, M = m;
-	S = (int)sqrtf(N / K);
+	S = (int)sqrt(N / K);
 
 	label = vector<int>(N, -1);
 	dis = vector<vector<float>>(width, vector<float>(height, 1e10));
 }
 
-void Sliv::initClusters()
+void Slic::initClusters()
 {
 	int x = S / 2, y = S / 2;
 	while (x < width) {
@@ -26,7 +26,6 @@ void Sliv::initClusters()
 		y = S / 2;
 		x += S;
 	}
-	cout << clusters.size() << endl;
 	K = clusters.size();
 
 	num = vector<int>(K, 0);
@@ -37,7 +36,7 @@ void Sliv::initClusters()
 	sumY = vector<int>(K, 0);
 }
 
-float Sliv::getGradient(int x, int y)
+float Slic::getGradient(int& x, int& y)
 {
 	if (x >= width - 1)
 		x = width - 2;
@@ -50,7 +49,7 @@ float Sliv::getGradient(int x, int y)
 	return gradient;
 }
 
-void Sliv::adjustCluster()
+void Slic::adjustCluster()
 {
 	int i, j, x, y;
 	float currGra, newGra;
@@ -69,7 +68,7 @@ void Sliv::adjustCluster()
 	}
 }
 
-void Sliv::search()
+void Slic::search()
 {
 	int x, y, xMin, xMax, yMin, yMax;
 	float L, A, B, l, a, b, Dc, Ds, D;
@@ -81,11 +80,11 @@ void Sliv::search()
 		for (x = xMin; x <= xMax; x++) {
 			for (y = yMin; y <= yMax; y++) {
 				L = image[x][y][0], A = image[x][y][1], B = image[x][y][2];
-				//Dc = sqrt(pow(L - l, 2) + pow(A - a, 2) + pow(B - b, 2));
-				Dc = (L - l) * (L - l) + (A - a) * (A - a) + (B - b) * (B - b);
-				//Ds = sqrt(pow(x - cluster.x, 2) + pow(y - cluster.y, 2));
-				Ds = (x - cluster.x) * (x - cluster.x) + (y - cluster.y) * (y - cluster.y);
-				//D = sqrt(pow(Dc / M, 2) + pow(Ds / S, 2));
+				Dc = sqrt(pow(L - l, 2) + pow(A - a, 2) + pow(B - b, 2));
+				//Dc = (L - l) * (L - l) + (A - a) * (A - a) + (B - b) * (B - b);
+				Ds = sqrt(pow(x - cluster.x, 2) + pow(y - cluster.y, 2));
+				//Ds = (x - cluster.x) * (x - cluster.x) + (y - cluster.y) * (y - cluster.y);
+				D = sqrt(pow(Dc / M, 2) + pow(Ds / S, 2));
 				D = Dc / M + Ds / S;
 
 				if (D < dis[x][y]) {
@@ -98,7 +97,7 @@ void Sliv::search()
 	}
 }
 
-void Sliv::update()
+void Slic::update()
 {
 	num.assign(K, 0);
 	sumL.assign(K, 0);
@@ -125,7 +124,7 @@ void Sliv::update()
 	}
 }
 
-void Sliv::train(int times)
+void Slic::train(int times)
 {
 	initClusters();
 	adjustCluster();
@@ -139,9 +138,8 @@ void Sliv::train(int times)
 	}
 }
 
-void Sliv::save(wstring fileName)
+void Slic::save(wstring fileName)
 {
-	int x, y;
 	IMAGE newImage = Image::copy(image, width, height);
 	for (int x = 0; x < width; x++)
 		for (int y = 0; y < height; y++) {

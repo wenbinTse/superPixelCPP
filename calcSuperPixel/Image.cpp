@@ -8,7 +8,11 @@
 IMAGE Image::read(wstring fileName, int& width, int& height)
 {
 	CImage image;
-	image.Load(fileName.c_str());
+	auto result = image.Load(fileName.c_str());
+	if (result == E_FAIL) {
+		cout << "文件不存在" << endl;
+		exit(-1);
+	}
 	height = image.GetHeight();
 	width = image.GetWidth();
 	IMAGE arr = create(width, height);
